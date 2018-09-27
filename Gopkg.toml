@@ -58,6 +58,11 @@
   version = "1.0.0"
 
 [[constraint]]
+  name = "github.com/ory/fosite"
+  source = "github.com/104corp/fosite"
+  branch = "master"
+
+[[constraint]]
   name = "github.com/parnurzeal/gorequest"
   version = "0.2.15"
 
