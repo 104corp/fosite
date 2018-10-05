@@ -23,6 +23,7 @@ package openid
 
 import (
 	"fmt"
+	"github.com/ory/fosite/internal"
 	"net/url"
 	"testing"
 
@@ -37,6 +38,12 @@ import (
 )
 
 func TestValidatePrompt(t *testing.T) {
+	j := &DefaultStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
+			PrivateKey: internal.MustECDSAKey(),
+		},
+	}
+
 	v := NewOpenIDConnectRequestValidator(nil, j)
 
 	var genIDToken = func(c jwt.IDTokenClaims) string {

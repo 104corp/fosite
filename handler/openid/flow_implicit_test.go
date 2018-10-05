@@ -22,6 +22,7 @@
 package openid
 
 import (
+	"github.com/ory/fosite/internal"
 	"testing"
 	"time"
 
@@ -45,6 +46,12 @@ func TestImplicit_HandleAuthorizeEndpointRequest(t *testing.T) {
 	areq := fosite.NewAuthorizeRequest()
 	areq.Session = new(fosite.DefaultSession)
 
+	j := &DefaultStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
+			PrivateKey: internal.MustECDSAKey(),
+		},
+	}
+
 	h := OpenIDConnectImplicitHandler{
 		AuthorizeImplicitGrantTypeHandler: &oauth2.AuthorizeImplicitGrantTypeHandler{
 			AccessTokenLifespan: time.Hour,
@@ -52,10 +59,11 @@ func TestImplicit_HandleAuthorizeEndpointRequest(t *testing.T) {
 			AccessTokenStorage:  storage.NewMemoryStore(),
 		},
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: idStrategy,
+			IDTokenStrategy: j,
 		},
 		ScopeStrategy:                 fosite.HierarchicScopeStrategy,
 		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),
+		Enigma:                        j.JWTStrategy,
 	}
 
 	for k, c := range []struct {

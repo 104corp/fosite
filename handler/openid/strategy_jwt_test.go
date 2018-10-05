@@ -22,6 +22,7 @@
 package openid
 
 import (
+	"github.com/ory/fosite/internal"
 	"testing"
 	"time"
 
@@ -36,6 +37,13 @@ import (
 
 func TestJWTStrategy_GenerateIDToken(t *testing.T) {
 	var req *fosite.AccessRequest
+
+	j := &DefaultStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
+			PrivateKey: internal.MustECDSAKey(),
+		},
+	}
+
 	for k, c := range []struct {
 		description string
 		setup       func()
