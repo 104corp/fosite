@@ -30,7 +30,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/ory/fosite/internal"
+	"github.com/104corp/fosite/internal"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/fosite/token/jwt"
@@ -113,8 +113,8 @@ var hmacStrategy = &oauth2.HMACSHAStrategy{
 }
 
 var jwtStrategy = &oauth2.DefaultJWTStrategy{
-	JWTStrategy: &jwt.RS256JWTStrategy{
-		PrivateKey: internal.MustRSAKey(),
+	JWTStrategy: &jwt.ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
 	},
 	HMACSHAStrategy: hmacStrategy,
 }

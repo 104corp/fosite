@@ -29,7 +29,7 @@ import (
 
 	"context"
 
-	"github.com/ory/fosite/internal"
+	"github.com/104corp/fosite/internal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -40,7 +40,7 @@ var header = &Headers{
 	},
 }
 
-func TestHash(t *testing.T) {
+func TestRS256Hash(t *testing.T) {
 	j := RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
 	}
@@ -50,34 +50,7 @@ func TestHash(t *testing.T) {
 	assert.NotEqual(t, in, out)
 }
 
-func TestAssign(t *testing.T) {
-	for k, c := range [][]map[string]interface{}{
-		{
-			{"foo": "bar"},
-			{"baz": "bar"},
-			{"foo": "bar", "baz": "bar"},
-		},
-		{
-			{"foo": "bar"},
-			{"foo": "baz"},
-			{"foo": "bar"},
-		},
-		{
-			{},
-			{"foo": "baz"},
-			{"foo": "baz"},
-		},
-		{
-			{"foo": "bar"},
-			{"foo": "baz", "bar": "baz"},
-			{"foo": "bar", "bar": "baz"},
-		},
-	} {
-		assert.EqualValues(t, c[2], assign(c[0], c[1]), "Case %d", k)
-	}
-}
-
-func TestGenerateJWT(t *testing.T) {
+func TestGenerateRS256JWT(t *testing.T) {
 	claims := &JWTClaims{
 		ExpiresAt: time.Now().UTC().Add(time.Hour),
 	}
@@ -129,7 +102,7 @@ func TestGenerateJWT(t *testing.T) {
 	require.Empty(t, sig, "%s", err)
 }
 
-func TestValidateSignatureRejectsJWT(t *testing.T) {
+func TestValidateSignatureRejectsRS256JWT(t *testing.T) {
 	var err error
 	j := RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
@@ -145,5 +118,113 @@ func TestValidateSignatureRejectsJWT(t *testing.T) {
 		_, err = j.Validate(context.TODO(), c)
 		assert.Error(t, err)
 		t.Logf("Passed test case %d", k)
+	}
+}
+
+func TestES256Hash(t *testing.T) {
+	j := ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
+	}
+	in := []byte("foo")
+	out, err := j.Hash(context.TODO(), in)
+	assert.NoError(t, err)
+	assert.NotEqual(t, in, out)
+}
+
+func TestGenerateES256JWT(t *testing.T) {
+	claims := &JWTClaims{
+		ExpiresAt: time.Now().UTC().Add(time.Hour),
+	}
+
+	j := ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
+	}
+
+	token, sig, err := j.Generate(context.TODO(), claims.ToMapClaims(), header)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+
+	sig, err = j.Validate(context.TODO(), token)
+	require.NoError(t, err)
+
+	sig, err = j.Validate(context.TODO(), token+"."+"0123456789")
+	require.Error(t, err)
+
+	partToken := strings.Split(token, ".")[2]
+
+	sig, err = j.Validate(context.TODO(), partToken)
+	require.Error(t, err)
+
+	// Reset private key
+	j.PrivateKey = internal.MustECDSAKey()
+
+	// Lets validate the exp claim
+	claims = &JWTClaims{
+		ExpiresAt: time.Now().UTC().Add(-time.Hour),
+	}
+	token, sig, err = j.Generate(context.TODO(), claims.ToMapClaims(), header)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+	//t.Logf("%s.%s", token, sig)
+
+	sig, err = j.Validate(context.TODO(), token)
+	require.Error(t, err)
+
+	// Lets validate the nbf claim
+	claims = &JWTClaims{
+		NotBefore: time.Now().UTC().Add(time.Hour),
+	}
+	token, sig, err = j.Generate(context.TODO(), claims.ToMapClaims(), header)
+	require.NoError(t, err)
+	require.NotNil(t, token)
+	//t.Logf("%s.%s", token, sig)
+	sig, err = j.Validate(context.TODO(), token)
+	require.Error(t, err)
+	require.Empty(t, sig, "%s", err)
+}
+
+func TestValidateSignatureRejectsES256JWT(t *testing.T) {
+	var err error
+	j := ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
+	}
+
+	for k, c := range []string{
+		"",
+		" ",
+		"foo.bar",
+		"foo.",
+		".foo",
+	} {
+		_, err = j.Validate(context.TODO(), c)
+		assert.Error(t, err)
+		t.Logf("Passed test case %d", k)
+	}
+}
+
+func TestAssign(t *testing.T) {
+	for k, c := range [][]map[string]interface{}{
+		{
+			{"foo": "bar"},
+			{"baz": "bar"},
+			{"foo": "bar", "baz": "bar"},
+		},
+		{
+			{"foo": "bar"},
+			{"foo": "baz"},
+			{"foo": "bar"},
+		},
+		{
+			{},
+			{"foo": "baz"},
+			{"foo": "baz"},
+		},
+		{
+			{"foo": "bar"},
+			{"foo": "baz", "bar": "baz"},
+			{"foo": "bar", "bar": "baz"},
+		},
+	} {
+		assert.EqualValues(t, c[2], assign(c[0], c[1]), "Case %d", k)
 	}
 }

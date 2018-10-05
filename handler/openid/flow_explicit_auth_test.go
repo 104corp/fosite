@@ -28,7 +28,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	"github.com/104corp/fosite/internal"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
@@ -55,9 +55,9 @@ func TestExplicit_HandleAuthorizeEndpointRequest(t *testing.T) {
 	h := &OpenIDConnectExplicitHandler{
 		OpenIDConnectRequestStorage: store,
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: j,
+			IDTokenStrategy: esStrategy,
 		},
-		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),
+		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, esStrategy.JWTStrategy),
 	}
 	for k, c := range []struct {
 		description string

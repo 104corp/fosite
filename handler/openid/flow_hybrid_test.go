@@ -32,7 +32,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/internal"
+	"github.com/104corp/fosite/internal"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/fosite/token/jwt"
@@ -40,9 +40,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var idStrategy = &DefaultStrategy{
+var _ = &DefaultStrategy{
 	JWTStrategy: &jwt.RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
+	},
+}
+
+var esStrategy = &DefaultStrategy{
+	JWTStrategy: &jwt.ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
 	},
 }
 
@@ -92,7 +98,7 @@ func TestHybrid_HandleAuthorizeEndpointRequest(t *testing.T) {
 			AccessTokenStorage:  storage.NewMemoryStore(),
 		},
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: idStrategy,
+			IDTokenStrategy: esStrategy,
 		},
 		ScopeStrategy:                 fosite.HierarchicScopeStrategy,
 		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),

@@ -29,14 +29,14 @@ import (
 	"fmt"
 
 	"github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	"github.com/104corp/fosite/internal"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 )
 
 var j = &DefaultJWTStrategy{
-	JWTStrategy: &jwt.RS256JWTStrategy{
-		PrivateKey: internal.MustRSAKey(),
+	JWTStrategy: &jwt.ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
 	},
 }
 

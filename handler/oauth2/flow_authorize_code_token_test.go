@@ -29,7 +29,7 @@ import (
 
 	//"github.com/golang/mock/gomock"
 	"github.com/ory/fosite"
-	//"github.com/ory/fosite/internal"
+	//"github.com/104corp/fosite/internal"
 	"time"
 
 	"context"

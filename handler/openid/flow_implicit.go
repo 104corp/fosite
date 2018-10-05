@@ -37,7 +37,7 @@ type OpenIDConnectImplicitHandler struct {
 	ScopeStrategy                 fosite.ScopeStrategy
 	OpenIDConnectRequestValidator *OpenIDConnectRequestValidator
 
-	RS256JWTStrategy *jwt.RS256JWTStrategy
+	Enigma jwt.JWTStrategy
 }
 
 func (c *OpenIDConnectImplicitHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
@@ -88,12 +88,12 @@ func (c *OpenIDConnectImplicitHandler) HandleAuthorizeEndpointRequest(ctx contex
 		}
 
 		ar.SetResponseTypeHandled("token")
-		hash, err := c.RS256JWTStrategy.Hash(ctx, []byte(resp.GetFragment().Get("access_token")))
+		hash, err := c.Enigma.Hash(ctx, []byte(resp.GetFragment().Get("access_token")))
 		if err != nil {
 			return err
 		}
 
-		claims.AccessTokenHash = base64.RawURLEncoding.EncodeToString([]byte(hash[:c.RS256JWTStrategy.GetSigningMethodLength()/2]))
+		claims.AccessTokenHash = base64.RawURLEncoding.EncodeToString([]byte(hash[:c.Enigma.GetSigningMethodLength()/2]))
 	} else {
 		resp.AddFragment("state", ar.GetState())
 	}
