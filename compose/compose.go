@@ -22,8 +22,8 @@
 package compose
 
 import (
+	"crypto/ecdsa"
 	"crypto/rsa"
-
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/token/jwt"
 )
@@ -58,7 +58,7 @@ func Compose(config *Config, storage interface{}, strategy interface{}, hasher f
 	}
 
 	f := &fosite.Fosite{
-		Store: storage.(fosite.Storage),
+		Store:                      storage.(fosite.Storage),
 		AuthorizeEndpointHandlers:  fosite.AuthorizeEndpointHandlers{},
 		TokenEndpointHandlers:      fosite.TokenEndpointHandlers{},
 		TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{},
@@ -98,6 +98,36 @@ func ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key *
 			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
 			OpenIDConnectTokenStrategy: NewOpenIDConnectStrategy(config, key),
 			JWTStrategy: &jwt.RS256JWTStrategy{
+				PrivateKey: key,
+			},
+		},
+		nil,
+
+		OAuth2AuthorizeExplicitFactory,
+		OAuth2AuthorizeImplicitFactory,
+		OAuth2ClientCredentialsGrantFactory,
+		OAuth2RefreshTokenGrantFactory,
+		OAuth2ResourceOwnerPasswordCredentialsFactory,
+
+		OAuth2PKCEFactory,
+
+		OpenIDConnectExplicitFactory,
+		OpenIDConnectImplicitFactory,
+		OpenIDConnectHybridFactory,
+		OpenIDConnectRefreshFactory,
+
+		OAuth2TokenIntrospectionFactory,
+	)
+}
+
+func ComposeAllEnabledByECDSA(config *Config, storage interface{}, secret []byte, key *ecdsa.PrivateKey) fosite.OAuth2Provider {
+	return Compose(
+		config,
+		storage,
+		&CommonStrategy{
+			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
+			OpenIDConnectTokenStrategy: NewECDSAOpenIDConnectStrategy(config, key),
+			JWTStrategy: &jwt.ES256JWTStrategy{
 				PrivateKey: key,
 			},
 		},

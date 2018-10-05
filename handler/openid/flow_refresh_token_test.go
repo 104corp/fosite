@@ -22,6 +22,7 @@
 package openid
 
 import (
+	"github.com/ory/fosite/internal"
 	"testing"
 
 	"github.com/ory/fosite"
@@ -93,6 +94,12 @@ func TestOpenIDConnectRefreshHandler_HandleTokenEndpointRequest(t *testing.T) {
 }
 
 func TestOpenIDConnectRefreshHandler_PopulateTokenEndpointResponse(t *testing.T) {
+	j := &DefaultStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
+			PrivateKey: internal.MustECDSAKey(),
+		},
+	}
+
 	h := &OpenIDConnectRefreshHandler{
 		IDTokenHandleHelper: &IDTokenHandleHelper{
 			IDTokenStrategy: j,

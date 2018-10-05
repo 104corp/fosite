@@ -82,6 +82,8 @@ func TestHybrid_HandleAuthorizeEndpointRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	j := esStrategy
+
 	aresp := fosite.NewAuthorizeResponse()
 	areq := fosite.NewAuthorizeRequest()
 	h := OpenIDConnectHybridHandler{
@@ -103,6 +105,7 @@ func TestHybrid_HandleAuthorizeEndpointRequest(t *testing.T) {
 		ScopeStrategy:                 fosite.HierarchicScopeStrategy,
 		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),
 		OpenIDConnectRequestStorage:   storage.NewMemoryStore(),
+		Enigma:                        j.JWTStrategy,
 	}
 
 	for k, c := range []struct {

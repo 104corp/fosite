@@ -22,8 +22,8 @@
 package compose
 
 import (
+	"crypto/ecdsa"
 	"crypto/rsa"
-
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
 	"github.com/ory/fosite/token/hmac"
@@ -56,9 +56,28 @@ func NewOAuth2JWTStrategy(key *rsa.PrivateKey, strategy *oauth2.HMACSHAStrategy)
 	}
 }
 
+func NewECDSAOAuth2JWTStrategy(key *ecdsa.PrivateKey, strategy *oauth2.HMACSHAStrategy) *oauth2.DefaultJWTStrategy {
+	return &oauth2.DefaultJWTStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
+			PrivateKey: key,
+		},
+		HMACSHAStrategy: strategy,
+	}
+}
+
 func NewOpenIDConnectStrategy(config *Config, key *rsa.PrivateKey) *openid.DefaultStrategy {
 	return &openid.DefaultStrategy{
 		JWTStrategy: &jwt.RS256JWTStrategy{
+			PrivateKey: key,
+		},
+		Expiry: config.GetIDTokenLifespan(),
+		Issuer: config.IDTokenIssuer,
+	}
+}
+
+func NewECDSAOpenIDConnectStrategy(config *Config, key *ecdsa.PrivateKey) *openid.DefaultStrategy {
+	return &openid.DefaultStrategy{
+		JWTStrategy: &jwt.ES256JWTStrategy{
 			PrivateKey: key,
 		},
 		Expiry: config.GetIDTokenLifespan(),
