@@ -32,7 +32,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
-	"github.com/104corp/fosite/internal"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/storage"
 	"github.com/ory/fosite/token/hmac"
 	"github.com/ory/fosite/token/jwt"
@@ -101,8 +101,9 @@ func TestHybrid_HandleAuthorizeEndpointRequest(t *testing.T) {
 			IDTokenStrategy: esStrategy,
 		},
 		ScopeStrategy:                 fosite.HierarchicScopeStrategy,
-		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),
+		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, esStrategy.JWTStrategy),
 		OpenIDConnectRequestStorage:   storage.NewMemoryStore(),
+		Enigma:                        esStrategy.JWTStrategy,
 	}
 
 	for k, c := range []struct {

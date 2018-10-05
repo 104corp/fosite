@@ -95,7 +95,7 @@ func TestOpenIDConnectRefreshHandler_HandleTokenEndpointRequest(t *testing.T) {
 func TestOpenIDConnectRefreshHandler_PopulateTokenEndpointResponse(t *testing.T) {
 	h := &OpenIDConnectRefreshHandler{
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: j,
+			IDTokenStrategy: esStrategy,
 		},
 	}
 	for _, c := range []struct {

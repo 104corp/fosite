@@ -37,10 +37,10 @@ import (
 )
 
 func TestValidatePrompt(t *testing.T) {
-	v := NewOpenIDConnectRequestValidator(nil, j)
+	v := NewOpenIDConnectRequestValidator(nil, esStrategy)
 
 	var genIDToken = func(c jwt.IDTokenClaims) string {
-		s, _, err := j.Generate(context.TODO(), c.ToMapClaims(), jwt.NewHeaders())
+		s, _, err := esStrategy.Generate(context.TODO(), c.ToMapClaims(), jwt.NewHeaders())
 		require.NoError(t, err)
 		return s
 	}

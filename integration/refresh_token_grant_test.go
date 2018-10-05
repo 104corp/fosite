@@ -29,7 +29,7 @@ import (
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/handler/openid"
-	"github.com/104corp/fosite/internal"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/token/jwt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

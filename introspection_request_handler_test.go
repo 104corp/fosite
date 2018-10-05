@@ -34,7 +34,7 @@ import (
 	"github.com/ory/fosite"
 	. "github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
-	"github.com/104corp/fosite/internal"
+	"github.com/ory/fosite/internal"
 	"github.com/ory/fosite/storage"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

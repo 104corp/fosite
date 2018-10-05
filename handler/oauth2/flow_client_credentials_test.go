@@ -30,7 +30,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/ory/fosite"
-	"github.com/104corp/fosite/internal"
+	"github.com/ory/fosite/internal"
 	"github.com/stretchr/testify/require"
 )
 
