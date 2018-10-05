@@ -40,7 +40,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var _ = &DefaultStrategy{
+var idStrategy = &DefaultStrategy{
 	JWTStrategy: &jwt.RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
 	},
