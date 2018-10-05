@@ -66,6 +66,7 @@ func OpenIDConnectImplicitFactory(config *Config, storage interface{}, strategy 
 			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
 		},
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(config.AllowedPromptValues, strategy.(jwt.JWTStrategy)),
+		Enigma: strategy.(jwt.JWTStrategy),
 	}
 }
 
@@ -93,5 +94,6 @@ func OpenIDConnectHybridFactory(config *Config, storage interface{}, strategy in
 		},
 		OpenIDConnectRequestStorage:   storage.(openid.OpenIDConnectRequestStorage),
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(config.AllowedPromptValues, strategy.(jwt.JWTStrategy)),
+		Enigma: strategy.(jwt.JWTStrategy),
 	}
 }

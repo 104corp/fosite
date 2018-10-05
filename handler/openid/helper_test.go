@@ -33,7 +33,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var strat = &DefaultStrategy{
+var _ = &DefaultStrategy{
 	JWTStrategy: &jwt.RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
 	},
@@ -99,7 +99,7 @@ func TestIssueExplicitToken(t *testing.T) {
 	}, Headers: &jwt.Headers{}})
 
 	resp.EXPECT().SetExtra("id_token", gomock.Any())
-	h := &IDTokenHandleHelper{IDTokenStrategy: strat}
+	h := &IDTokenHandleHelper{IDTokenStrategy: esStrategy}
 	err := h.IssueExplicitIDToken(nil, ar, resp)
 	assert.NoError(t, err)
 }
@@ -116,7 +116,7 @@ func TestIssueImplicitToken(t *testing.T) {
 	}, Headers: &jwt.Headers{}})
 
 	resp.EXPECT().AddFragment("id_token", gomock.Any())
-	h := &IDTokenHandleHelper{IDTokenStrategy: strat}
+	h := &IDTokenHandleHelper{IDTokenStrategy: esStrategy}
 	err := h.IssueImplicitIDToken(nil, ar, resp)
 	assert.NoError(t, err)
 }

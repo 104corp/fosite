@@ -39,7 +39,7 @@ type OpenIDConnectHybridHandler struct {
 	OpenIDConnectRequestValidator     *OpenIDConnectRequestValidator
 	OpenIDConnectRequestStorage       OpenIDConnectRequestStorage
 
-	Enigma *jwt.RS256JWTStrategy
+	Enigma jwt.JWTStrategy
 }
 
 func (c *OpenIDConnectHybridHandler) HandleAuthorizeEndpointRequest(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {

@@ -113,8 +113,8 @@ var hmacStrategy = &oauth2.HMACSHAStrategy{
 }
 
 var jwtStrategy = &oauth2.DefaultJWTStrategy{
-	JWTStrategy: &jwt.RS256JWTStrategy{
-		PrivateKey: internal.MustRSAKey(),
+	JWTStrategy: &jwt.ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
 	},
 	HMACSHAStrategy: hmacStrategy,
 }

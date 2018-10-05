@@ -40,9 +40,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var idStrategy = &DefaultStrategy{
+var _ = &DefaultStrategy{
 	JWTStrategy: &jwt.RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
+	},
+}
+
+var esStrategy = &DefaultStrategy{
+	JWTStrategy: &jwt.ES256JWTStrategy{
+		PrivateKey: internal.MustECDSAKey(),
 	},
 }
 
@@ -92,7 +98,7 @@ func TestHybrid_HandleAuthorizeEndpointRequest(t *testing.T) {
 			AccessTokenStorage:  storage.NewMemoryStore(),
 		},
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: idStrategy,
+			IDTokenStrategy: esStrategy,
 		},
 		ScopeStrategy:                 fosite.HierarchicScopeStrategy,
 		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),

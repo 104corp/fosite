@@ -34,7 +34,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var j = &DefaultStrategy{
+var _ = &DefaultStrategy{
 	JWTStrategy: &jwt.RS256JWTStrategy{
 		PrivateKey: internal.MustRSAKey(),
 	},
@@ -55,9 +55,9 @@ func TestExplicit_HandleAuthorizeEndpointRequest(t *testing.T) {
 	h := &OpenIDConnectExplicitHandler{
 		OpenIDConnectRequestStorage: store,
 		IDTokenHandleHelper: &IDTokenHandleHelper{
-			IDTokenStrategy: j,
+			IDTokenStrategy: esStrategy,
 		},
-		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, j.JWTStrategy),
+		OpenIDConnectRequestValidator: NewOpenIDConnectRequestValidator(nil, esStrategy.JWTStrategy),
 	}
 	for k, c := range []struct {
 		description string
