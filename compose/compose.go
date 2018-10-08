@@ -130,7 +130,7 @@ func ComposeAllEnabledCommon(config *Config, storage interface{}, secret []byte,
 		&CommonStrategy{
 			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
 			OpenIDConnectTokenStrategy: NewOpenIDConnectStrategyCommon(config, key),
-			JWTStrategy:                NewJWTStrategy(key),
+			JWTStrategy:                newJWTStrategy(key),
 		},
 		nil,
 

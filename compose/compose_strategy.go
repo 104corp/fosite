@@ -71,7 +71,7 @@ func NewOpenIDConnectStrategy(config *Config, key *rsa.PrivateKey) *openid.Defau
 // 依據傳入的 key 類型建立對應的 OAuth2 JWT Strategy
 func NewOAuth2JWTStrategyCommon(key crypto.PrivateKey, strategy *oauth2.HMACSHAStrategy) *oauth2.DefaultJWTStrategy {
 	return &oauth2.DefaultJWTStrategy{
-		JWTStrategy:     NewJWTStrategy(key),
+		JWTStrategy:     newJWTStrategy(key),
 		HMACSHAStrategy: strategy,
 	}
 }
@@ -79,14 +79,14 @@ func NewOAuth2JWTStrategyCommon(key crypto.PrivateKey, strategy *oauth2.HMACSHAS
 // 依據傳入的 key 類型建立對應的 OpenID Connect JWT Strategy
 func NewOpenIDConnectStrategyCommon(config *Config, key crypto.PrivateKey) *openid.DefaultStrategy {
 	return &openid.DefaultStrategy{
-		JWTStrategy: NewJWTStrategy(key),
+		JWTStrategy: newJWTStrategy(key),
 		Expiry:      config.GetIDTokenLifespan(),
 		Issuer:      config.IDTokenIssuer,
 	}
 }
 
 // 依據 crypto.PrivateKey 的類型建立對應的 jwt.JWTStrategy
-func NewJWTStrategy(key crypto.PrivateKey) jwt.JWTStrategy {
+func newJWTStrategy(key crypto.PrivateKey) jwt.JWTStrategy {
 	switch key := (interface{})(key).(type) {
 	case *ecdsa.PrivateKey:
 		return &jwt.ES256JWTStrategy{
