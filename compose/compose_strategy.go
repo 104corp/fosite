@@ -25,6 +25,8 @@ import (
 	"crypto"
 	"crypto/ecdsa"
 	"crypto/rsa"
+	"github.com/pkg/errors"
+	"reflect"
 
 	"github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/handler/openid"
@@ -69,7 +71,7 @@ func NewOpenIDConnectStrategy(config *Config, key *rsa.PrivateKey) *openid.Defau
 }
 
 // 依據傳入的 key 類型建立對應的 OAuth2 JWT Strategy
-func NewOAuth2JWTStrategyCommon(key crypto.PrivateKey, strategy *oauth2.HMACSHAStrategy) *oauth2.DefaultJWTStrategy {
+func NewCorp104OAuth2JWTStrategy(key crypto.PrivateKey, strategy *oauth2.HMACSHAStrategy) *oauth2.DefaultJWTStrategy {
 	return &oauth2.DefaultJWTStrategy{
 		JWTStrategy:     newJWTStrategy(key),
 		HMACSHAStrategy: strategy,
@@ -77,7 +79,7 @@ func NewOAuth2JWTStrategyCommon(key crypto.PrivateKey, strategy *oauth2.HMACSHAS
 }
 
 // 依據傳入的 key 類型建立對應的 OpenID Connect JWT Strategy
-func NewOpenIDConnectStrategyCommon(config *Config, key crypto.PrivateKey) *openid.DefaultStrategy {
+func NewCorp104OpenIDConnectStrategy(config *Config, key crypto.PrivateKey) *openid.DefaultStrategy {
 	return &openid.DefaultStrategy{
 		JWTStrategy: newJWTStrategy(key),
 		Expiry:      config.GetIDTokenLifespan(),
@@ -97,8 +99,6 @@ func newJWTStrategy(key crypto.PrivateKey) jwt.JWTStrategy {
 			PrivateKey: key,
 		}
 	default:
-		return &jwt.RS256JWTStrategy{
-			PrivateKey: nil,
-		}
+		panic(errors.Errorf("Key type not supported: %s", reflect.TypeOf(key)))
 	}
 }

@@ -121,15 +121,14 @@ func ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key *
 	)
 }
 
-// ComposeAllEnabledCommon returns a fosite instance with all OAuth2 and OpenID Connect handlers enabled.
-// 以 crypto.PrivateKey 介面作為傳入的 private key 類型
-func ComposeAllEnabledCommon(config *Config, storage interface{}, secret []byte, key crypto.PrivateKey) fosite.OAuth2Provider {
+// Corp104ComposeAllEnabled returns a fosite instance with all OAuth2 and OpenID Connect handlers enabled.
+func Corp104ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key crypto.PrivateKey) fosite.OAuth2Provider {
 	return Compose(
 		config,
 		storage,
 		&CommonStrategy{
 			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
-			OpenIDConnectTokenStrategy: NewOpenIDConnectStrategyCommon(config, key),
+			OpenIDConnectTokenStrategy: NewCorp104OpenIDConnectStrategy(config, key),
 			JWTStrategy:                newJWTStrategy(key),
 		},
 		nil,
