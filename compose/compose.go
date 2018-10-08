@@ -22,6 +22,7 @@
 package compose
 
 import (
+	"crypto"
 	"crypto/rsa"
 
 	"github.com/ory/fosite"
@@ -58,7 +59,7 @@ func Compose(config *Config, storage interface{}, strategy interface{}, hasher f
 	}
 
 	f := &fosite.Fosite{
-		Store: storage.(fosite.Storage),
+		Store:                      storage.(fosite.Storage),
 		AuthorizeEndpointHandlers:  fosite.AuthorizeEndpointHandlers{},
 		TokenEndpointHandlers:      fosite.TokenEndpointHandlers{},
 		TokenIntrospectionHandlers: fosite.TokenIntrospectionHandlers{},
@@ -100,6 +101,36 @@ func ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key *
 			JWTStrategy: &jwt.RS256JWTStrategy{
 				PrivateKey: key,
 			},
+		},
+		nil,
+
+		OAuth2AuthorizeExplicitFactory,
+		OAuth2AuthorizeImplicitFactory,
+		OAuth2ClientCredentialsGrantFactory,
+		OAuth2RefreshTokenGrantFactory,
+		OAuth2ResourceOwnerPasswordCredentialsFactory,
+
+		OAuth2PKCEFactory,
+
+		OpenIDConnectExplicitFactory,
+		OpenIDConnectImplicitFactory,
+		OpenIDConnectHybridFactory,
+		OpenIDConnectRefreshFactory,
+
+		OAuth2TokenIntrospectionFactory,
+	)
+}
+
+// ComposeAllEnabledCommon returns a fosite instance with all OAuth2 and OpenID Connect handlers enabled.
+// 以 crypto.PrivateKey 介面作為傳入的 private key 類型
+func ComposeAllEnabledCommon(config *Config, storage interface{}, secret []byte, key crypto.PrivateKey) fosite.OAuth2Provider {
+	return Compose(
+		config,
+		storage,
+		&CommonStrategy{
+			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
+			OpenIDConnectTokenStrategy: NewOpenIDConnectStrategyCommon(config, key),
+			JWTStrategy:                NewJWTStrategy(key),
 		},
 		nil,
 
