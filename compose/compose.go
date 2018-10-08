@@ -22,6 +22,7 @@
 package compose
 
 import (
+	"crypto"
 	"crypto/rsa"
 
 	"github.com/ory/fosite"
@@ -100,6 +101,35 @@ func ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key *
 			JWTStrategy: &jwt.RS256JWTStrategy{
 				PrivateKey: key,
 			},
+		},
+		nil,
+
+		OAuth2AuthorizeExplicitFactory,
+		OAuth2AuthorizeImplicitFactory,
+		OAuth2ClientCredentialsGrantFactory,
+		OAuth2RefreshTokenGrantFactory,
+		OAuth2ResourceOwnerPasswordCredentialsFactory,
+
+		OAuth2PKCEFactory,
+
+		OpenIDConnectExplicitFactory,
+		OpenIDConnectImplicitFactory,
+		OpenIDConnectHybridFactory,
+		OpenIDConnectRefreshFactory,
+
+		OAuth2TokenIntrospectionFactory,
+	)
+}
+
+// Corp104ComposeAllEnabled returns a fosite instance with all OAuth2 and OpenID Connect handlers enabled.
+func Corp104ComposeAllEnabled(config *Config, storage interface{}, secret []byte, key crypto.PrivateKey) fosite.OAuth2Provider {
+	return Compose(
+		config,
+		storage,
+		&CommonStrategy{
+			CoreStrategy:               NewOAuth2HMACStrategy(config, secret, nil),
+			OpenIDConnectTokenStrategy: NewCorp104OpenIDConnectStrategy(config, key),
+			JWTStrategy:                newJWTStrategy(key),
 		},
 		nil,
 
