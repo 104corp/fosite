@@ -23,6 +23,7 @@ package fosite
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"crypto/rsa"
 	"fmt"
 	"net/http"
@@ -207,7 +208,7 @@ func (f *Fosite) AuthenticateClient(ctx context.Context, r *http.Request, form u
 	return client, nil
 }
 
-func findPublicKey(t *jwt.Token, set *jose.JSONWebKeySet) (*rsa.PublicKey, error) {
+func findPublicKey(t *jwt.Token, set *jose.JSONWebKeySet) (interface{}, error) {
 	kid, ok := t.Header["kid"].(string)
 	if !ok {
 		return nil, errors.WithStack(ErrInvalidRequest.WithHint("The JSON Web Token must contain a kid header value but did not."))
@@ -222,12 +223,21 @@ func findPublicKey(t *jwt.Token, set *jose.JSONWebKeySet) (*rsa.PublicKey, error
 		if key.Use != "sig" {
 			continue
 		}
+		if k, ok := key.Key.(*ecdsa.PrivateKey); ok && k != nil {
+			return &k.PublicKey, nil
+		}
+		if k, ok := key.Key.(*rsa.PrivateKey); ok && k != nil {
+			return &k.PublicKey, nil
+		}
+		if k, ok := key.Key.(*ecdsa.PublicKey); ok {
+			return k, nil
+		}
 		if k, ok := key.Key.(*rsa.PublicKey); ok {
 			return k, nil
 		}
 	}
 
-	return nil, errors.WithStack(ErrInvalidRequest.WithHintf("Unable to find RSA public key with use=\"sig\" for kid \"%s\" in JSON Web Key Set.", kid))
+	return nil, errors.WithStack(ErrInvalidRequest.WithHintf("Unable to find public key with use=\"sig\" for kid \"%s\" in JSON Web Key Set.", kid))
 }
 
 func clientCredentialsFromRequest(r *http.Request, form url.Values) (clientID, clientSecret string, err error) {
